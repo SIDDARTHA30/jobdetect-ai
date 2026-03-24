@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./backend/saved_models:/app/saved_models
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./jobs.db
+      - MODEL_PATH=/app/saved_models/job_classifier.pkl
+      - DEBUG=true
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
